@@ -1,0 +1,8 @@
+Makefile
+.qmake.stash
+changewall
+*.o
+main.moc
+moc_*.cpp
+moc_predefs.h
+qrc_*.cpp

@@ -1,0 +1,26 @@
+pkgname=changewall
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Animated KDE Plasma wallpaper switcher"
+arch=('x86_64')
+# Replace this URL with the published repository URL before submitting to AUR.
+url="https://example.invalid/changewall"
+license=('MIT')
+depends=('qt6-base' 'qt6-declarative' 'kglobalaccel' 'plasma-workspace')
+makedepends=('qt6-base')
+install="$pkgname.install"
+# Replace the source tarball with your tagged release archive once the project is published.
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  qmake6 changewall.pro
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  make INSTALL_ROOT="$pkgdir" install
+  install -Dm755 scripts/install-user.sh "$pkgdir/usr/share/changewall/install-user.sh"
+}

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=ChangeWall
+Comment=Animated KDE Plasma wallpaper switcher
+Exec=changewall
+Terminal=false
+Categories=Utility;DesktopSettings;Qt;KDE;
+X-KDE-autostart-after=panel
