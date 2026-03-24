@@ -55,7 +55,7 @@ bool CommandServer::sendCommand(const QString &serverName, const QStringList &ar
 
 void CommandServer::handleConnection(QLocalSocket *socket)
 {
-    connect(socket, &QLocalSocket::readyRead, this, [this, socket]() {
+    const auto processPayload = [this, socket]() {
         const QString payload = QString::fromUtf8(socket->readAll());
         const QStringList arguments = payload.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
         if (!arguments.isEmpty()) {
@@ -63,5 +63,11 @@ void CommandServer::handleConnection(QLocalSocket *socket)
         }
         socket->disconnectFromServer();
         socket->deleteLater();
-    });
+    };
+
+    connect(socket, &QLocalSocket::readyRead, this, processPayload);
+
+    if (socket->bytesAvailable() > 0) {
+        processPayload();
+    }
 }

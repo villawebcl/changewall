@@ -1,5 +1,5 @@
 pkgname=changewall
-pkgver=0.1.2
+pkgver=0.1.3
 pkgrel=1
 pkgdesc="Animated KDE Plasma wallpaper switcher"
 arch=('x86_64')
@@ -9,7 +9,7 @@ depends=('qt6-base' 'qt6-declarative' 'kglobalaccel' 'plasma-workspace')
 makedepends=('qt6-base')
 install="$pkgname.install"
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('e9b2532545d639c11924ec90f7c96f78576a25d50d8c0bc39db73bb6b232ad71')
+sha256sums=('892455121b5d531681ba37d1a04965339dc6f3fceb876af3f21e5cc850fa0634')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
