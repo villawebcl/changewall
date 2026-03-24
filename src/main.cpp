@@ -319,9 +319,7 @@ int main(int argc, char *argv[])
     parser.addOption({QStringLiteral("duration"), QStringLiteral("Transition duration in milliseconds."), QStringLiteral("ms"), QStringLiteral("420")});
     parser.process(app);
 
-    const bool interactiveSetup = !parser.isSet(QStringLiteral("next-wallpaper"))
-        && !parser.isSet(QStringLiteral("random-wallpaper"))
-        && !parser.isSet(QStringLiteral("setup"));
+    const bool interactiveSetup = !parser.isSet(QStringLiteral("setup"));
     QString errorMessage;
     QString effectiveConfigPath;
 

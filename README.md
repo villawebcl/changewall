@@ -118,6 +118,7 @@ Important:
 
 - Global shortcuts are registered by `KGlobalAccel` when `changewall` starts for the first time.
 - Package installation alone does not force keys into a running Plasma session; the daemon must be launched once.
+- If you run `changewall --next-wallpaper` or `changewall --random-wallpaper` before the config exists, ChangeWall now opens the folder picker first and then applies the command.
 - If the config file is missing, the first launch opens a directory picker instead of failing.
 
 ## AUR Notes
