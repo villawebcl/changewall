@@ -28,6 +28,13 @@ bool CommandServer::listen(const QString &serverName, QString *errorMessage)
     return false;
 }
 
+bool CommandServer::isRunning(const QString &serverName)
+{
+    QLocalSocket socket;
+    socket.connectToServer(serverName);
+    return socket.waitForConnected(300);
+}
+
 bool CommandServer::sendCommand(const QString &serverName, const QStringList &arguments, QString *errorMessage)
 {
     QLocalSocket socket;

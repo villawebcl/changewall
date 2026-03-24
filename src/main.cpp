@@ -302,6 +302,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QStringLiteral("changewall"));
     app.setApplicationDisplayName(QStringLiteral("ChangeWall"));
     app.setOrganizationName(QStringLiteral("changewall"));
+    app.setDesktopFileName(QStringLiteral("changewall"));
     app.setQuitOnLastWindowClosed(false);
 
     QCommandLineParser parser;
@@ -318,8 +319,9 @@ int main(int argc, char *argv[])
     parser.addOption({QStringLiteral("duration"), QStringLiteral("Transition duration in milliseconds."), QStringLiteral("ms"), QStringLiteral("420")});
     parser.process(app);
 
-    const bool interactiveSetup = !app.arguments().contains(QStringLiteral("--next-wallpaper"))
-        && !app.arguments().contains(QStringLiteral("--random-wallpaper"));
+    const bool interactiveSetup = !parser.isSet(QStringLiteral("next-wallpaper"))
+        && !parser.isSet(QStringLiteral("random-wallpaper"))
+        && !parser.isSet(QStringLiteral("setup"));
     QString errorMessage;
     QString effectiveConfigPath;
 
@@ -337,6 +339,10 @@ int main(int argc, char *argv[])
     const CommandRequest requestedCommand = parseCommandLine(parser);
     if (requestedCommand.type != CommandType::None) {
         if (CommandServer::sendCommand(serverName(), serializeCommand(requestedCommand), &errorMessage)) {
+            return 0;
+        }
+    } else if (!parser.isSet(QStringLiteral("setup"))) {
+        if (CommandServer::isRunning(serverName())) {
             return 0;
         }
     }
