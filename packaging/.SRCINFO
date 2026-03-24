@@ -12,6 +12,6 @@ pkgbase = changewall
 	depends = kglobalaccel
 	depends = plasma-workspace
 	source = changewall-0.1.0.tar.gz::https://github.com/villawebcl/changewall/archive/refs/tags/v0.1.0.tar.gz
-	sha256sums = SKIP
+	sha256sums = 8c987e964cf9d48dc1cc59575340adae75fb7d196c63b0f474679d25874f6eed
 
 pkgname = changewall
