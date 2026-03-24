@@ -26,7 +26,7 @@ RESOURCES += resources/resources.qrc
 INCLUDEPATH += /usr/include/KF6 /usr/include/KF6/KGlobalAccel
 LIBS += -lKF6GlobalAccel
 
-INSTALLS += target desktop sampleconfig autostart
+INSTALLS += target desktop sampleconfig autostart wrappers
 target.path = /usr/bin
 desktop.files = packaging/changewall.desktop
 desktop.path = /usr/share/applications
@@ -34,3 +34,8 @@ sampleconfig.files = config/config.json
 sampleconfig.path = /usr/share/changewall
 autostart.files = packaging/changewall-autostart.desktop
 autostart.path = /etc/xdg/autostart
+wrappers.files = \
+    scripts/changewall-next \
+    scripts/changewall-random \
+    scripts/changewall-setup
+wrappers.path = /usr/bin

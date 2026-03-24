@@ -2,7 +2,6 @@
 
 #include <QDBusConnection>
 #include <QDBusMessage>
-#include <QDBusReply>
 #include <QFileInfo>
 
 PlasmaIntegration::PlasmaIntegration(QObject *parent)
@@ -27,10 +26,10 @@ bool PlasmaIntegration::applyWallpaper(const QString &wallpaperPath, QString *er
         QStringLiteral("evaluateScript"));
 
     message << wallpaperScript(absolutePath);
-    const QDBusReply<QVariant> reply = QDBusConnection::sessionBus().call(message);
-    if (!reply.isValid()) {
+    const QDBusMessage reply = QDBusConnection::sessionBus().call(message);
+    if (reply.type() == QDBusMessage::ErrorMessage) {
         if (errorMessage) {
-            *errorMessage = reply.error().message();
+            *errorMessage = reply.errorMessage();
         }
         return false;
     }

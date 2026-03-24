@@ -16,4 +16,5 @@ signals:
 
 private:
     QAction *createAction(const QString &name, const QString &componentName, const QList<QKeySequence> &shortcuts);
+    void registerShortcut(QAction *action, const QList<QKeySequence> &shortcuts);
 };

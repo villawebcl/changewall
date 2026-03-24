@@ -146,6 +146,11 @@ struct CommandRequest {
     CommandType type = CommandType::None;
 };
 
+enum class StartupMode {
+    Normal,
+    Setup,
+};
+
 CommandRequest parseCommandLine(const QCommandLineParser &parser)
 {
     if (parser.isSet(QStringLiteral("next-wallpaper"))) {
@@ -155,6 +160,56 @@ CommandRequest parseCommandLine(const QCommandLineParser &parser)
         return {CommandType::RandomWallpaper};
     }
     return {};
+}
+
+StartupMode parseStartupMode(const QCommandLineParser &parser)
+{
+    if (parser.isSet(QStringLiteral("setup"))) {
+        return StartupMode::Setup;
+    }
+    return StartupMode::Normal;
+}
+
+bool applyPositionalCommand(const QStringList &arguments,
+                            StartupMode *startupMode,
+                            CommandRequest *request,
+                            QString *errorMessage)
+{
+    if (arguments.isEmpty()) {
+        return true;
+    }
+
+    if (arguments.size() > 1) {
+        if (errorMessage) {
+            *errorMessage = QObject::tr("Too many positional arguments: %1").arg(arguments.join(QLatin1Char(' ')));
+        }
+        return false;
+    }
+
+    const QString command = arguments.first().trimmed().toLower();
+    if (command == QStringLiteral("next") || command == QStringLiteral("next-wallpaper")) {
+        request->type = CommandType::NextWallpaper;
+        return true;
+    }
+
+    if (command == QStringLiteral("random") || command == QStringLiteral("random-wallpaper")) {
+        request->type = CommandType::RandomWallpaper;
+        return true;
+    }
+
+    if (command == QStringLiteral("setup")) {
+        *startupMode = StartupMode::Setup;
+        return true;
+    }
+
+    if (command == QStringLiteral("daemon") || command == QStringLiteral("run")) {
+        return true;
+    }
+
+    if (errorMessage) {
+        *errorMessage = QObject::tr("Unknown command: %1").arg(arguments.first());
+    }
+    return false;
 }
 
 QStringList serializeCommand(const CommandRequest &request)
@@ -309,21 +364,33 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(QStringLiteral("KDE Plasma wallpaper switcher with animated transitions"));
     parser.addHelpOption();
     parser.addVersionOption();
+    parser.addPositionalArgument(QStringLiteral("command"),
+                                 QStringLiteral("Optional command: next, random, setup, or daemon."));
     parser.addOption({QStringList{QStringLiteral("c"), QStringLiteral("config")},
                       QStringLiteral("Path to config JSON file."),
                       QStringLiteral("path"),
                       defaultConfigPath()});
-    parser.addOption({QStringLiteral("setup"), QStringLiteral("Open the wallpaper folder setup dialog and rewrite the config.")});
-    parser.addOption({QStringLiteral("next-wallpaper"), QStringLiteral("Apply the next wallpaper from the active or configured wallpaper directory.")});
-    parser.addOption({QStringLiteral("random-wallpaper"), QStringLiteral("Apply a random wallpaper from the active or configured wallpaper directory.")});
+    parser.addOption({QStringList{QStringLiteral("s"), QStringLiteral("setup")},
+                      QStringLiteral("Open the wallpaper folder setup dialog and rewrite the config.")});
+    parser.addOption({QStringList{QStringLiteral("n"), QStringLiteral("next"), QStringLiteral("next-wallpaper")},
+                      QStringLiteral("Apply the next wallpaper from the active or configured wallpaper directory.")});
+    parser.addOption({QStringList{QStringLiteral("r"), QStringLiteral("random"), QStringLiteral("random-wallpaper")},
+                      QStringLiteral("Apply a random wallpaper from the active or configured wallpaper directory.")});
     parser.addOption({QStringLiteral("duration"), QStringLiteral("Transition duration in milliseconds."), QStringLiteral("ms"), QStringLiteral("420")});
     parser.process(app);
 
-    const bool interactiveSetup = !parser.isSet(QStringLiteral("setup"));
+    StartupMode startupMode = parseStartupMode(parser);
+    CommandRequest requestedCommand = parseCommandLine(parser);
     QString errorMessage;
+    if (!applyPositionalCommand(parser.positionalArguments(), &startupMode, &requestedCommand, &errorMessage)) {
+        qCritical() << errorMessage;
+        return 1;
+    }
+
+    const bool interactiveSetup = startupMode != StartupMode::Setup;
     QString effectiveConfigPath;
 
-    if (parser.isSet(QStringLiteral("setup"))) {
+    if (startupMode == StartupMode::Setup) {
         effectiveConfigPath = runSetupDialog(parser.value(QStringLiteral("config")), &errorMessage);
     } else {
         effectiveConfigPath = ensureConfigFile(parser.value(QStringLiteral("config")), interactiveSetup, &errorMessage);
@@ -334,12 +401,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    const CommandRequest requestedCommand = parseCommandLine(parser);
     if (requestedCommand.type != CommandType::None) {
         if (CommandServer::sendCommand(serverName(), serializeCommand(requestedCommand), &errorMessage)) {
             return 0;
         }
-    } else if (!parser.isSet(QStringLiteral("setup"))) {
+    } else if (startupMode != StartupMode::Setup) {
         if (CommandServer::isRunning(serverName())) {
             return 0;
         }

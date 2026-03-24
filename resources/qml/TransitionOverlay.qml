@@ -1,13 +1,7 @@
 import QtQuick 2.15
-import QtQuick.Window 2.15
 
-Window {
+Item {
     id: root
-    flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-    color: "transparent"
-    visible: false
-    visibility: Window.FullScreen
-    title: "ChangeWallOverlay"
 
     property url oldSource: ""
     property url newSource: ""

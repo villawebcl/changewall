@@ -69,6 +69,16 @@ Available commands:
 ./changewall --duration 550
 ```
 
+Short forms also work:
+
+```bash
+./changewall next
+./changewall random
+./changewall setup
+./changewall --next
+./changewall --random
+```
+
 Default global shortcuts:
 
 - `Meta+F11`: next wallpaper
@@ -87,6 +97,7 @@ make -j"$(nproc)"
 This copies:
 
 - the binary to `~/.local/bin/changewall`
+- helper commands to `~/.local/bin/changewall-next`, `~/.local/bin/changewall-random`, and `~/.local/bin/changewall-setup`
 - an autostart entry to `~/.config/autostart/changewall.desktop`
 
 At the first launch, the app asks for the wallpaper folder and creates the user config automatically.
@@ -102,6 +113,9 @@ sudo make install
 That installs:
 
 - `/usr/bin/changewall`
+- `/usr/bin/changewall-next`
+- `/usr/bin/changewall-random`
+- `/usr/bin/changewall-setup`
 - `/usr/share/applications/changewall.desktop`
 - `/usr/share/changewall/config.json`
 - `/etc/xdg/autostart/changewall-autostart.desktop`
@@ -117,7 +131,7 @@ Config format:
 Important:
 
 - Global shortcuts are registered by `KGlobalAccel` when `changewall` starts for the first time.
-- Package installation alone does not force keys into a running Plasma session; the daemon must be launched once.
+- Package installation alone should not be expected to inject a GUI process into an already-running Plasma session; the intended flow is to launch `changewall` once, choose the folder, and keep using it.
 - If you run `changewall --next-wallpaper` or `changewall --random-wallpaper` before the config exists, ChangeWall now opens the folder picker first and then applies the command.
 - If the config file is missing, the first launch opens a directory picker instead of failing.
 
